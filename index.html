@@ -1,0 +1,2038 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>테니스플러스 내전 | 공식 스코어보드 (모바일 최적화)</title>
+<style>
+  :root {
+    --bg-main: #091310;
+    --bg-panel: #10201b;
+    --bg-card: #152923;
+    --bg-input: #0b1714;
+    --border-subtle: rgba(163, 230, 53, 0.18);
+    --border-bright: rgba(163, 230, 53, 0.48);
+    --tennis-volt: #ccff00;
+    --tennis-volt-dim: rgba(204, 255, 0, 0.14);
+    --court-emerald: #10b981;
+    --star1: #38bdf8;
+    --star2: #34d399;
+    --star34: #fbbf24;
+    --text-primary: #f8fafc;
+    --text-secondary: #94a3b8;
+    --text-muted: #64748b;
+  }
+
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Google Sites iframe 내부에서도 뚝 잘리지 않고 자체 스크롤이 부드럽게 작동하도록 설정 */
+  html, body {
+    width: 100%;
+    max-width: 100vw;
+    min-height: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans KR", sans-serif;
+    background-color: var(--bg-main);
+    background-image:
+      radial-gradient(circle at 18% 5%, rgba(16, 185, 129, 0.14), transparent 40%),
+      radial-gradient(circle at 82% 95%, rgba(204, 255, 0, 0.08), transparent 45%);
+    color: var(--text-primary);
+    line-height: 1.4;
+    padding-bottom: 56px;
+  }
+
+  .mono {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  }
+
+  /* Compact Mobile-First Header */
+  header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: rgba(9, 19, 16, 0.96);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border-subtle);
+    padding: 10px 12px;
+  }
+
+  .header-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .header-top-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+  }
+
+  .tennis-ball {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 30% 30%, #e6ff66, #b8e600 70%, #86a800);
+    box-shadow: 0 0 10px rgba(204, 255, 0, 0.35);
+    position: relative;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+  .tennis-ball::before,
+  .tennis-ball::after {
+    content: '';
+    position: absolute;
+    width: 22px;
+    height: 22px;
+    border: 2px solid rgba(255, 255, 255, 0.85);
+    border-radius: 50%;
+    top: 3px;
+  }
+  .tennis-ball::before { left: -14px; }
+  .tennis-ball::after { right: -14px; }
+
+  .brand-text h1 {
+    font-size: 0.96rem;
+    font-weight: 900;
+    letter-spacing: -0.02em;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    white-space: nowrap;
+  }
+
+  .badge-live {
+    font-size: 0.58rem;
+    font-weight: 800;
+    background: var(--tennis-volt);
+    color: #091310;
+    padding: 1px 6px;
+    border-radius: 999px;
+  }
+
+  .top-actions {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    flex-wrap: wrap;
+  }
+
+  .btn {
+    border: none;
+    border-radius: 8px;
+    font-weight: 800;
+    font-size: 0.74rem;
+    padding: 7px 10px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    transition: transform 0.12s ease;
+    white-space: nowrap;
+  }
+  .btn:active { transform: scale(0.95); }
+
+  .btn-volt { background: var(--tennis-volt); color: #091310; }
+  .btn-emerald {
+    background: rgba(16, 185, 129, 0.2);
+    color: #6ee7b7;
+    border: 1px solid rgba(16, 185, 129, 0.45);
+  }
+  .btn-ghost {
+    background: rgba(255, 255, 255, 0.07);
+    color: var(--text-primary);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+  }
+  .btn-supervisor {
+    background: rgba(251, 191, 36, 0.16);
+    color: #fde68a;
+    border: 1px solid rgba(251, 191, 36, 0.45);
+  }
+  .btn-supervisor.unlocked {
+    background: var(--tennis-volt);
+    color: #091310;
+    border-color: var(--tennis-volt);
+  }
+
+  .sync-pill {
+    font-size: 0.66rem;
+    padding: 3px 8px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.06);
+    color: var(--text-secondary);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    white-space: nowrap;
+  }
+  .sync-pill.connected {
+    background: rgba(16, 185, 129, 0.16);
+    color: #6ee7b7;
+    border-color: rgba(16, 185, 129, 0.45);
+  }
+
+  /* Supervisor Status Strip */
+  .role-banner {
+    max-width: 1100px;
+    margin: 8px auto 0;
+    padding: 0 10px;
+  }
+  .role-banner-inner {
+    border-radius: 10px;
+    padding: 7px 10px;
+    font-size: 0.72rem;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 4px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.09);
+    color: var(--text-secondary);
+  }
+  .role-banner-inner.admin-active {
+    background: rgba(204, 255, 0, 0.1);
+    border-color: rgba(204, 255, 0, 0.42);
+    color: var(--tennis-volt);
+  }
+
+  /* Mobile-Optimized 2x2 Division Tabs + Full-Width Stage Tabs */
+  .nav-wrap {
+    max-width: 1100px;
+    margin: 10px auto 0;
+    padding: 0 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .div-tab-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    background: var(--bg-panel);
+    border: 1px solid var(--border-subtle);
+    border-radius: 12px;
+    padding: 4px;
+    gap: 4px;
+  }
+
+  @media (min-width: 768px) {
+    .nav-wrap {
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .div-tab-grid {
+      grid-template-columns: repeat(4, auto);
+    }
+  }
+
+  .stage-tab-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    background: var(--bg-panel);
+    border: 1px solid var(--border-subtle);
+    border-radius: 12px;
+    padding: 4px;
+    gap: 4px;
+  }
+
+  .tab-btn {
+    background: transparent;
+    color: var(--text-secondary);
+    border: none;
+    border-radius: 8px;
+    padding: 9px 8px;
+    font-size: 0.78rem;
+    font-weight: 800;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.15s ease;
+    white-space: nowrap;
+  }
+
+  .tab-btn.active {
+    background: var(--tennis-volt);
+    color: #091310;
+    box-shadow: 0 2px 8px rgba(204, 255, 0, 0.25);
+  }
+
+  .div-btn.active[data-div="1"] { background: var(--star1); color: #06131c; }
+  .div-btn.active[data-div="2"] { background: var(--star2); color: #051711; }
+  .div-btn.active[data-div="34"] { background: var(--star34); color: #1a1003; }
+  .div-btn.active[data-div="grand"] { background: linear-gradient(90deg, #f59e0b, #ccff00); color: #091310; }
+
+  /* Main Container */
+  .container {
+    max-width: 1100px;
+    margin: 10px auto 0;
+    padding: 0 10px;
+  }
+
+  .panel {
+    background: var(--bg-panel);
+    border: 1px solid var(--border-subtle);
+    border-radius: 14px;
+    padding: 12px;
+    margin-bottom: 14px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+  }
+
+  .panel-header {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 12px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  @media (min-width: 768px) {
+    .panel-header {
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+    }
+  }
+
+  .panel-title {
+    font-size: 0.9rem;
+    font-weight: 900;
+    line-height: 1.3;
+  }
+
+  .panel-sub-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px;
+  }
+
+  .badge-info {
+    font-size: 0.68rem;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.07);
+    color: var(--text-secondary);
+  }
+
+  /* League Grid (1 Col Mobile -> 2 Col Desktop) */
+  .league-groups-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+  @media (min-width: 920px) {
+    .league-groups-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  .group-box {
+    background: var(--bg-card);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    padding: 10px;
+  }
+
+  .group-box-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+
+  .group-title {
+    font-size: 0.88rem;
+    font-weight: 900;
+    color: var(--tennis-volt);
+  }
+
+  /* Compact Matrix Table for Mobile Screens (No Horizontal Cut-off) */
+  .table-scroll {
+    width: 100%;
+    overflow-x: auto;
+    margin-bottom: 12px;
+  }
+
+  .matrix-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.72rem;
+    background: rgba(9, 19, 16, 0.65);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .matrix-table th {
+    background: rgba(204, 255, 0, 0.12);
+    color: var(--tennis-volt);
+    font-weight: 800;
+    padding: 6px 3px;
+    text-align: center;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    white-space: nowrap;
+  }
+  .matrix-table th.left,
+  .matrix-table td.left {
+    text-align: left;
+    padding-left: 6px;
+  }
+
+  .matrix-table td {
+    padding: 6px 3px;
+    text-align: center;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    white-space: nowrap;
+  }
+
+  .matrix-table td.diag {
+    background: rgba(255, 255, 255, 0.06);
+  }
+
+  .type-pill {
+    font-size: 0.58rem;
+    padding: 1px 4px;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--text-secondary);
+    margin-left: 2px;
+    font-weight: 700;
+  }
+
+  .rank-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    border-radius: 5px;
+    font-weight: 900;
+    font-size: 0.7rem;
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--text-secondary);
+  }
+  .rank-1 { background: var(--tennis-volt); color: #091310; }
+  .rank-2 { background: rgba(16, 185, 129, 0.28); color: #6ee7b7; border: 1px solid rgba(16, 185, 129, 0.5); }
+
+  /* Ordered Match List (Thumb-Friendly) */
+  .order-title {
+    font-size: 0.72rem;
+    font-weight: 800;
+    color: var(--text-secondary);
+    margin-bottom: 6px;
+  }
+
+  .match-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .match-row {
+    background: rgba(9, 19, 16, 0.75);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 9px;
+    padding: 7px 6px;
+    display: grid;
+    grid-template-columns: 20px minmax(0, 1fr) auto minmax(0, 1fr);
+    align-items: center;
+    gap: 5px;
+  }
+  .match-row.completed {
+    border-color: rgba(16, 185, 129, 0.38);
+    background: rgba(16, 185, 129, 0.06);
+  }
+
+  .order-num {
+    width: 19px;
+    height: 19px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--text-secondary);
+    font-size: 0.65rem;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .m-team {
+    font-size: 0.75rem;
+    font-weight: 700;
+    line-height: 1.2;
+    word-break: keep-all;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .m-team.left { text-align: right; }
+  .m-team.right { text-align: left; }
+  .m-team.winner { color: var(--tennis-volt); font-weight: 900; }
+
+  .score-box {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    flex-shrink: 0;
+  }
+
+  .score-input {
+    width: 34px;
+    height: 30px;
+    background: var(--bg-input);
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    border-radius: 6px;
+    color: var(--text-primary);
+    font-size: 0.88rem;
+    font-weight: 900;
+    text-align: center;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
+  .score-input:focus {
+    outline: none;
+    border-color: var(--tennis-volt);
+    box-shadow: 0 0 0 2px rgba(204, 255, 0, 0.22);
+  }
+  .score-input:disabled {
+    background: rgba(255, 255, 255, 0.03);
+    border-color: rgba(255, 255, 255, 0.08);
+    color: var(--text-primary);
+    opacity: 0.94;
+  }
+
+  /* Tournament Bracket: Vertical Stack on Mobile, Horizontal Tree on Desktop */
+  .bracket-section-box {
+    background: rgba(9, 19, 16, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    padding: 10px;
+    margin-bottom: 14px;
+  }
+  .bracket-section-box:last-child { margin-bottom: 0; }
+
+  .b-sec-head {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 10px;
+  }
+  .b-sec-title {
+    font-size: 0.82rem;
+    font-weight: 900;
+    color: var(--tennis-volt);
+    line-height: 1.3;
+  }
+
+  .bracket-scroll {
+    width: 100%;
+  }
+
+  .bracket-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    width: 100%;
+    min-width: 0 !important;
+  }
+
+  @media (min-width: 860px) {
+    .bracket-grid {
+      flex-direction: row;
+      align-items: stretch;
+      gap: 18px;
+    }
+  }
+
+  .round-col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    gap: 10px;
+  }
+
+  .round-header {
+    text-align: center;
+    font-size: 0.76rem;
+    font-weight: 900;
+    color: var(--tennis-volt);
+    background: rgba(204, 255, 0, 0.1);
+    border: 1px solid rgba(204, 255, 0, 0.25);
+    padding: 6px;
+    border-radius: 8px;
+  }
+
+  .b-match {
+    background: var(--bg-card);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 11px;
+    padding: 9px;
+  }
+  .b-match.highlight-card {
+    border-color: var(--tennis-volt);
+    box-shadow: 0 0 16px rgba(204, 255, 0, 0.14);
+  }
+
+  .b-match-label {
+    font-size: 0.65rem;
+    font-weight: 800;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .b-slot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    background: rgba(9, 19, 16, 0.75);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 8px;
+    padding: 7px 8px;
+    margin-bottom: 5px;
+  }
+  .b-slot:last-child { margin-bottom: 0; }
+  .b-slot.winner {
+    border-color: var(--tennis-volt);
+    background: rgba(204, 255, 0, 0.12);
+  }
+
+  .b-team-info {
+    min-width: 0;
+    flex: 1;
+  }
+  .b-seed {
+    font-size: 0.64rem;
+    color: var(--tennis-volt);
+    font-weight: 800;
+    display: block;
+  }
+  .b-name {
+    font-size: 0.82rem;
+    font-weight: 800;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
+  }
+  .b-name-input {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px dashed rgba(204, 255, 0, 0.4);
+    border-radius: 6px;
+    color: var(--text-primary);
+    font-size: 0.82rem;
+    font-weight: 800;
+    padding: 5px 8px;
+    margin-top: 3px;
+  }
+  .b-name-input:focus {
+    outline: none;
+    border-style: solid;
+    border-color: var(--tennis-volt);
+    background: #08110e;
+  }
+  .b-name-input:disabled {
+    background: transparent;
+    border: none;
+    padding: 2px 0;
+    color: var(--text-primary);
+    opacity: 0.95;
+  }
+
+  .b-score {
+    width: 40px;
+    height: 32px;
+    background: var(--bg-input);
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    border-radius: 7px;
+    color: var(--text-primary);
+    font-weight: 900;
+    font-size: 0.9rem;
+    text-align: center;
+    flex-shrink: 0;
+  }
+  .b-score:disabled {
+    background: rgba(255, 255, 255, 0.03);
+    border-color: rgba(255, 255, 255, 0.08);
+    opacity: 0.94;
+  }
+
+  .advancer-box {
+    background: linear-gradient(135deg, rgba(204, 255, 0, 0.16), rgba(16, 185, 129, 0.16));
+    border: 1px solid var(--tennis-volt);
+    border-radius: 11px;
+    padding: 11px;
+    text-align: center;
+  }
+  .advancer-box .label {
+    font-size: 0.68rem;
+    font-weight: 800;
+    color: var(--tennis-volt);
+  }
+  .advancer-box .val {
+    font-size: 0.94rem;
+    font-weight: 900;
+    margin-top: 3px;
+  }
+
+  /* Modal */
+  .modal-backdrop {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    background: rgba(0, 0, 0, 0.78);
+    backdrop-filter: blur(4px);
+    align-items: center;
+    justify-content: center;
+    padding: 14px;
+  }
+  .modal-backdrop.open { display: flex; }
+
+  .modal-box {
+    width: 100%;
+    max-width: 440px;
+    max-height: 90vh;
+    overflow-y: auto;
+    background: #12241f;
+    border: 1px solid var(--border-bright);
+    border-radius: 16px;
+    padding: 16px;
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.65);
+  }
+
+  .modal-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+  .modal-head h3 { font-size: 0.96rem; font-weight: 900; }
+
+  input.text-input {
+    width: 100%;
+    background: #08110e;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 9px;
+    color: #f8fafc;
+    padding: 10px 12px;
+    font-size: 0.86rem;
+    margin-top: 5px;
+  }
+
+  .help-step {
+    background: rgba(255, 255, 255, 0.04);
+    border-radius: 10px;
+    padding: 10px 12px;
+    margin-bottom: 10px;
+    font-size: 0.76rem;
+    color: var(--text-secondary);
+  }
+  .help-step strong { color: var(--text-primary); }
+
+  .toast {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%) translateY(16px);
+    background: var(--tennis-volt);
+    color: #091310;
+    font-weight: 800;
+    font-size: 0.8rem;
+    padding: 9px 16px;
+    border-radius: 999px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.22s ease;
+    z-index: 150;
+    white-space: nowrap;
+  }
+  .toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="header-top-row">
+      <div class="brand">
+        <div class="tennis-ball"></div>
+        <div class="brand-text">
+          <h1>테니스플러스 스코어보드 <span class="badge-live">LIVE</span></h1>
+        </div>
+      </div>
+
+      <div class="top-actions">
+        <span id="syncStatusPill" class="sync-pill">☁️ 동기화</span>
+        <button id="btnSupervisorToggle" class="btn btn-supervisor" onclick="handleSupervisorClick()">🔒 감독관</button>
+        <button class="btn btn-emerald" onclick="copyFullSummary()">📋 복사</button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- 감독관 권한 상태 안내 바 -->
+<div class="role-banner">
+  <div id="roleBannerInner" class="role-banner-inner">
+    <span id="roleBannerText">👀 <strong>열람 전용 모드:</strong> 순위 및 대진표 조회만 가능 (점수 입력·수정은 감독관 인증 필요)</span>
+    <span id="lastEditorBadge" class="mono" style="font-size:0.68rem;"></span>
+  </div>
+</div>
+
+<!-- Division & Stage Navigation -->
+<div class="nav-wrap">
+  <div class="div-tab-grid">
+    <button class="tab-btn div-btn active" data-div="1" onclick="selectDivision('1')">★ 1스타 (8팀)</button>
+    <button class="tab-btn div-btn" data-div="2" onclick="selectDivision('2')">★★ 2스타 (6팀)</button>
+    <button class="tab-btn div-btn" data-div="34" onclick="selectDivision('34')">★★★+★★★★ 통합</button>
+    <button class="tab-btn div-btn" data-div="grand" onclick="selectDivision('grand')">👑 통합 최종전</button>
+  </div>
+
+  <div class="stage-tab-grid" id="stageTabGroup">
+    <button class="tab-btn stage-btn active" data-stage="league" onclick="selectStage('league')">1️⃣ 예선 조별리그</button>
+    <button class="tab-btn stage-btn" data-stage="bracket" onclick="selectStage('bracket')">2️⃣ 본선 토너먼트</button>
+  </div>
+</div>
+
+<main class="container">
+  <!-- VIEW 1: 예선 조별리그 -->
+  <section id="viewLeague">
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title">
+          <span id="leagueTitle">★ 1스타 예선 조별리그</span>
+        </div>
+        <div class="panel-sub-actions">
+          <span class="badge-info">순위: ①승수 → ②득실차 → ③다득점</span>
+          <button class="btn btn-volt admin-only-btn" onclick="advanceDivisionToBracket()">본선 대진표 반영 →</button>
+        </div>
+      </div>
+
+      <div id="leagueGroupsContainer" class="league-groups-grid"></div>
+    </div>
+  </section>
+
+  <!-- VIEW 2: 부서별 본선 토너먼트 -->
+  <section id="viewBracket" style="display:none;">
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title">
+          <span id="bracketTitle">🏆 1스타 본선 토너먼트</span>
+        </div>
+        <div class="panel-sub-actions">
+          <button class="btn btn-volt admin-only-btn" onclick="advanceDivisionToBracket()">🔄 예선 순위로 시드 갱신</button>
+        </div>
+      </div>
+      <div id="bracketContainer"></div>
+    </div>
+  </section>
+
+  <!-- VIEW 3: 통합 최종전 (6강 -> 4강 -> 결승 -> 우승) -->
+  <section id="viewGrand" style="display:none;">
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title">
+          <span>👑 테니스플러스 내전 통합 최종전 (6강)</span>
+        </div>
+        <div class="panel-sub-actions">
+          <span class="badge-info">팀명 직접 입력 · 승자 자동 진출</span>
+          <button class="btn btn-ghost admin-only-btn" onclick="clearGrandBracket()">칸 비우기</button>
+        </div>
+      </div>
+      <div id="grandContainer"></div>
+    </div>
+  </section>
+</main>
+
+<!-- MODAL: 감독관 인증 & 비밀번호 관리 -->
+<div id="authModal" class="modal-backdrop" onclick="if(event.target===this) closeModal('authModal')">
+  <div class="modal-box">
+    <div class="modal-head">
+      <h3>🔐 감독관(운영진) 인증</h3>
+      <button class="btn btn-ghost" onclick="closeModal('authModal')">✕</button>
+    </div>
+
+    <div id="authLoginSection">
+      <div class="help-step">
+        점수 입력 및 수정 권한이 있는 <strong>감독관 성함</strong>과 <strong>감독관 인증 코드</strong>를 입력해 주세요.
+      </div>
+      <label style="font-size:0.78rem; font-weight:800;">감독관 성함 (기록 로그용)</label>
+      <input type="text" id="supervisorNameInput" class="text-input" placeholder="예: 김수민 감독관" />
+
+      <div style="margin-top:10px;">
+        <label style="font-size:0.78rem; font-weight:800;">감독관 인증 코드</label>
+        <input type="password" id="supervisorPassInput" class="text-input" placeholder="감독관 인증 코드 입력" onkeydown="if(event.key==='Enter') verifySupervisor()" />
+      </div>
+
+      <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:14px;">
+        <button class="btn btn-ghost" onclick="closeModal('authModal')">취소</button>
+        <button class="btn btn-volt" onclick="verifySupervisor()">인증 및 잠금해제</button>
+      </div>
+    </div>
+
+    <div id="authManageSection" style="display:none;">
+      <div class="help-step" style="border:1px solid rgba(204,255,0,0.35);">
+        현재 <strong id="currentAdminNameDisplay" style="color:var(--tennis-volt);">감독관</strong> 권한으로 로그인되어 있습니다. 모든 예선·본선·최종전 점수를 자유롭게 입력하고 추후 수정할 수 있습니다.
+      </div>
+
+      <div style="margin-top:10px;">
+        <label style="font-size:0.78rem; font-weight:800;">감독관 인증 코드 변경</label>
+        <input type="text" id="newPassInput" class="text-input" placeholder="새 감독관 코드 입력" />
+      </div>
+
+      <div style="display:flex; justify-content:space-between; gap:8px; margin-top:14px; flex-wrap:wrap;">
+        <div style="display:flex; gap:6px;">
+          <button class="btn btn-ghost" style="color:#fda4af;" onclick="logoutSupervisor()">🔒 잠금</button>
+          <button class="btn btn-ghost" style="color:#fca5a5;" onclick="if(confirm('모든 점수를 초기화할까요?')){resetAllScores(); closeModal('authModal');}">전체 초기화</button>
+        </div>
+        <div style="display:flex; gap:6px;">
+          <button class="btn btn-ghost" onclick="changeSupervisorPass()">코드 변경</button>
+          <button class="btn btn-volt" onclick="closeModal('authModal')">확인</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="toast">저장되었습니다!</div>
+
+<script>
+// ★ 아래 따옴표 안에 구글 Apps Script 웹 앱 URL(.../exec)을 한 번만 넣어두면
+// 구글 사이트를 껐다 켜거나 다른 기기에서 접속해도 영구 저장 & 자동 복원됩니다!
+const DEFAULT_GAS_URL = "https://script.google.com/macros/s/AKfycbzZY5cMAuZhW2bjS64UJoeMmoMEL5uSF74yAJPxZnes2snaWzKuXHqWCjaMRSQvTQrJ/exec";
+
+const STORAGE_KEY = 'tennisplus_official_board_v4';
+const GAS_URL_KEY = 'tennisplus_gas_url_v3';
+const ADMIN_SESSION_KEY = 'tennisplus_admin_session_v3';
+
+function getActiveGasUrl() {
+  const defaultUrl = (typeof DEFAULT_GAS_URL === 'string') ? DEFAULT_GAS_URL.trim() : '';
+  if (defaultUrl) return defaultUrl;
+  try {
+    return (localStorage.getItem(GAS_URL_KEY) || '').trim();
+  } catch (e) {
+    return '';
+  }
+}
+
+// 첨부된 '테니스플러스_내전_조별대진표 (1).pdf'의 확정 명단 및 경기 순서 100% 반영
+const FIXED_LEAGUE_DATA = {
+  '1': {
+    label: '★ 1스타 예선 조별리그 (4팀 2개 조 · 조별 6경기)',
+    groups: {
+      'A': {
+        teams: [
+          { no: 1, id: '1A-1', name: '유한욱·박정례', type: '혼복' },
+          { no: 2, id: '1A-2', name: '김수지·김효경', type: '여복' },
+          { no: 3, id: '1A-3', name: '한광희·모수빈', type: '혼복' },
+          { no: 4, id: '1A-4', name: '김다현·권주희', type: '여복' }
+        ],
+        // PDF 1페이지 A조 경기 순서 (1~6번)
+        schedule: [
+          [0, 1], // 1: ① 유한욱·박정례 vs ② 김수지·김효경
+          [2, 3], // 2: ③ 한광희·모수빈 vs ④ 김다현·권주희
+          [0, 2], // 3: ① 유한욱·박정례 vs ③ 한광희·모수빈
+          [1, 3], // 4: ② 김수지·김효경 vs ④ 김다현·권주희
+          [0, 3], // 5: ① 유한욱·박정례 vs ④ 김다현·권주희
+          [1, 2]  // 6: ② 김수지·김효경 vs ③ 한광희·모수빈
+        ]
+      },
+      'B': {
+        teams: [
+          { no: 1, id: '1B-1', name: '김지연·김영현', type: '혼복' },
+          { no: 2, id: '1B-2', name: '마리·김소연', type: '여복' },
+          { no: 3, id: '1B-3', name: '주하영·최은정', type: '여복' },
+          { no: 4, id: '1B-4', name: '이여빈·이승찬', type: '혼복' }
+        ],
+        // PDF 1페이지 B조 경기 순서 (1~6번)
+        schedule: [
+          [0, 1], // 1: ① 김지연·김영현 vs ② 마리·김소연
+          [2, 3], // 2: ③ 주하영·최은정 vs ④ 이여빈·이승찬
+          [0, 2], // 3: ① 김지연·김영현 vs ③ 주하영·최은정
+          [1, 3], // 4: ② 마리·김소연 vs ④ 이여빈·이승찬
+          [0, 3], // 5: ① 김지연·김영현 vs ④ 이여빈·이승찬
+          [1, 2]  // 6: ② 마리·김소연 vs ③ 주하영·최은정
+        ]
+      }
+    }
+  },
+  '2': {
+    label: '★★ 2스타 예선 조별리그 (3팀 2개 조 · 조별 3경기)',
+    groups: {
+      'A': {
+        teams: [
+          { no: 1, id: '2A-1', name: '김신욱·김유현', type: '남복' },
+          { no: 2, id: '2A-2', name: '박수빈·김석문', type: '혼복' },
+          { no: 3, id: '2A-3', name: '원지은·고혁기', type: '혼복' }
+        ],
+        // PDF 2페이지 A조 경기 순서 (1~3번)
+        schedule: [
+          [0, 1], // 1: ① 김신욱·김유현 vs ② 박수빈·김석문
+          [1, 2], // 2: ② 박수빈·김석문 vs ③ 원지은·고혁기
+          [0, 2]  // 3: ① 김신욱·김유현 vs ③ 원지은·고혁기
+        ]
+      },
+      'B': {
+        teams: [
+          { no: 1, id: '2B-1', name: '장철웅·안주현', type: '혼복' },
+          { no: 2, id: '2B-2', name: '방이섭·장도진', type: '남복' },
+          { no: 3, id: '2B-3', name: '백승운·백승관', type: '남복' }
+        ],
+        // PDF 2페이지 B조 경기 순서 (1~3번)
+        schedule: [
+          [0, 1], // 1: ① 장철웅·안주현 vs ② 방이섭·장도진
+          [1, 2], // 2: ② 방이섭·장도진 vs ③ 백승운·백승관
+          [0, 2]  // 3: ① 장철웅·안주현 vs ③ 백승운·백승관
+        ]
+      }
+    }
+  },
+  '34': {
+    label: '★★★+★★★★ 통합 예선 조별리그 (3팀 2개 조 · 조별 3경기)',
+    groups: {
+      'A': {
+        teams: [
+          { no: 1, id: '34A-1', name: '임성호·이은선', type: '혼복' },
+          { no: 2, id: '34A-2', name: '김수민·임종경', type: '남복' },
+          { no: 3, id: '34A-3', name: '이지숙·최홍준', type: '혼복' }
+        ],
+        // PDF 3페이지 A조 경기 순서 (1~3번)
+        schedule: [
+          [0, 1], // 1: ① 임성호·이은선 vs ② 김수민·임종경
+          [1, 2], // 2: ② 김수민·임종경 vs ③ 이지숙·최홍준
+          [0, 2]  // 3: ① 임성호·이은선 vs ③ 이지숙·최홍준
+        ]
+      },
+      'B': {
+        teams: [
+          { no: 1, id: '34B-1', name: '오태양·이명진', type: '혼복' },
+          { no: 2, id: '34B-2', name: '김종순·이승헌', type: '남복' },
+          { no: 3, id: '34B-3', name: '정성훈·차영빈', type: '남복' }
+        ],
+        // PDF 3페이지 B조 경기 순서 (1~3번)
+        schedule: [
+          [0, 1], // 1: ① 오태양·이명진 vs ② 김종순·이승헌
+          [1, 2], // 2: ② 김종순·이승헌 vs ③ 정성훈·차영빈
+          [0, 2]  // 3: ① 오태양·이명진 vs ③ 정성훈·차영빈
+        ]
+      }
+    }
+  }
+};
+
+function createInitialBrackets() {
+  return {
+    // 1스타 본선: 토너먼트 A (각 조 1·2위 -> 4강 승자 2팀 최종전 진출) + 토너먼트 B (각 조 3·4위 -> 4강 -> 결승 우승)
+    '1': {
+      tourA: {
+        sf1: { t1: { seed: 'A조 1위', name: 'A조 1위' }, t2: { seed: 'B조 2위', name: 'B조 2위' }, s1: '', s2: '' },
+        sf2: { t1: { seed: 'B조 1위', name: 'B조 1위' }, t2: { seed: 'A조 2위', name: 'A조 2위' }, s1: '', s2: '' }
+      },
+      tourB: {
+        sf1: { t1: { seed: 'A조 3위', name: 'A조 3위' }, t2: { seed: 'B조 4위', name: 'B조 4위' }, s1: '', s2: '' },
+        sf2: { t1: { seed: 'B조 3위', name: 'B조 3위' }, t2: { seed: 'A조 4위', name: 'A조 4위' }, s1: '', s2: '' },
+        final: { s1: '', s2: '' }
+      }
+    },
+    // 2스타 본선: A1, B1 부전승(4강 직행) / 8강 1경기(B2 vs A3), 8강 2경기(A2 vs B3) -> 4강 승자 2팀 최종전 진출
+    '2': {
+      seedA1: { seed: 'A조 1위 (부전승)', name: 'A조 1위' },
+      seedB1: { seed: 'B조 1위 (부전승)', name: 'B조 1위' },
+      qf1: { t1: { seed: 'B조 2위', name: 'B조 2위' }, t2: { seed: 'A조 3위', name: 'A조 3위' }, s1: '', s2: '' },
+      qf2: { t1: { seed: 'A조 2위', name: 'A조 2위' }, t2: { seed: 'B조 3위', name: 'B조 3위' }, s1: '', s2: '' },
+      sf1: { s1: '', s2: '' },
+      sf2: { s1: '', s2: '' }
+    },
+    // 3·4스타 본선: 2스타와 동일 구조 (8강 -> 4강 -> 최종전 진출 ①, ②)
+    '34': {
+      seedA1: { seed: 'A조 1위 (부전승)', name: 'A조 1위' },
+      seedB1: { seed: 'B조 1위 (부전승)', name: 'B조 1위' },
+      qf1: { t1: { seed: 'B조 2위', name: 'B조 2위' }, t2: { seed: 'A조 3위', name: 'A조 3위' }, s1: '', s2: '' },
+      qf2: { t1: { seed: 'A조 2위', name: 'A조 2위' }, t2: { seed: 'B조 3위', name: 'B조 3위' }, s1: '', s2: '' },
+      sf1: { s1: '', s2: '' },
+      sf2: { s1: '', s2: '' }
+    },
+    // 통합 최종전: 추첨 결과에 따라 감독관이 이름을 자유롭게 입력할 수 있는 빈 슬롯
+    'grand': {
+      slotA: { seed: 'A · 부전승', name: '' },
+      slota: { seed: 'a · 부전승', name: '' },
+      slotb: { seed: 'b', name: '' },
+      slotC: { seed: 'C', name: '' },
+      slotB: { seed: 'B', name: '' },
+      slotc: { seed: 'c', name: '' },
+      qf1: { s1: '', s2: '' }, // b vs C
+      qf2: { s1: '', s2: '' }, // B vs c
+      sf1: { s1: '', s2: '' }, // A vs qf1 승자
+      sf2: { s1: '', s2: '' }, // a vs qf2 승자
+      final: { s1: '', s2: '' }
+    }
+  };
+}
+
+let state = {
+  supervisorPass: 'tp2026',
+  leagueScores: {}, // key: `${div}_${group}_${idxA}_${idxB}` -> { s1, s2 }
+  brackets: createInitialBrackets(),
+  lastEditor: '',
+  updatedAt: Date.now()
+};
+
+let isSupervisor = false;
+let supervisorName = '';
+let currentDiv = '1';
+let currentStage = 'league';
+let pollTimer = null;
+
+function showToast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 2400);
+}
+
+// 감독관 권한 관리
+function loadAdminSession() {
+  try {
+    const raw = sessionStorage.getItem(ADMIN_SESSION_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (parsed && parsed.ok) {
+        isSupervisor = true;
+        supervisorName = parsed.name || '감독관';
+      }
+    }
+  } catch (e) {}
+  updateRoleUI();
+}
+
+function handleSupervisorClick() {
+  if (isSupervisor) {
+    document.getElementById('authLoginSection').style.display = 'none';
+    document.getElementById('authManageSection').style.display = 'block';
+    document.getElementById('currentAdminNameDisplay').textContent = supervisorName;
+  } else {
+    document.getElementById('authLoginSection').style.display = 'block';
+    document.getElementById('authManageSection').style.display = 'none';
+  }
+  openModal('authModal');
+}
+
+function verifySupervisor() {
+  const name = document.getElementById('supervisorNameInput').value.trim() || '감독관';
+  const pass = document.getElementById('supervisorPassInput').value.trim();
+  const validPass = state.supervisorPass || 'tp2026';
+
+  if (pass !== validPass) {
+    showToast('❌ 감독관 인증 코드가 일치하지 않습니다.');
+    return;
+  }
+
+  isSupervisor = true;
+  supervisorName = name;
+  sessionStorage.setItem(ADMIN_SESSION_KEY, JSON.stringify({ ok: true, name }));
+  document.getElementById('supervisorPassInput').value = '';
+  closeModal('authModal');
+  updateRoleUI();
+  renderAll();
+  showToast(`✅ ${supervisorName} 권한으로 점수 입력·수정이 활성화되었습니다.`);
+}
+
+function logoutSupervisor() {
+  isSupervisor = false;
+  supervisorName = '';
+  sessionStorage.removeItem(ADMIN_SESSION_KEY);
+  closeModal('authModal');
+  updateRoleUI();
+  renderAll();
+  showToast('🔒 열람 전용 모드로 전환되었습니다.');
+}
+
+function changeSupervisorPass() {
+  if (!isSupervisor) return;
+  const np = document.getElementById('newPassInput').value.trim();
+  if (np.length < 3) {
+    showToast('새 코드는 3자 이상 입력해 주세요.');
+    return;
+  }
+  state.supervisorPass = np;
+  state.lastEditor = `${supervisorName} (코드변경)`;
+  state.updatedAt = Date.now();
+  saveState();
+  document.getElementById('newPassInput').value = '';
+  showToast('✅ 감독관 인증 코드가 변경되었습니다.');
+}
+
+function updateRoleUI() {
+  const btn = document.getElementById('btnSupervisorToggle');
+  const banner = document.getElementById('roleBannerInner');
+  const text = document.getElementById('roleBannerText');
+  const editorBadge = document.getElementById('lastEditorBadge');
+
+  if (isSupervisor) {
+    btn.textContent = `🔓 ${supervisorName} (편집중)`;
+    btn.classList.add('unlocked');
+    banner.classList.add('admin-active');
+    text.innerHTML = `✍️ <strong>감독관 편집 모드 (${supervisorName}):</strong> 모든 예선·본선·최종전 점수를 자유롭게 입력하고 추후 수정할 수 있습니다.`;
+  } else {
+    btn.textContent = '🔒 감독관 인증';
+    btn.classList.remove('unlocked');
+    banner.classList.remove('admin-active');
+    text.innerHTML = `👀 <strong>열람 전용 모드 (View Only):</strong> 일반 참가자는 실시간 순위와 대진표 조회만 가능하며, 점수 입력·수정은 감독관 인증 후 가능합니다.`;
+  }
+
+  document.querySelectorAll('.admin-only-btn').forEach(el => {
+    el.style.display = isSupervisor ? 'inline-flex' : 'none';
+  });
+
+  if (state.lastEditor) {
+    const tStr = new Date(state.updatedAt).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' });
+    editorBadge.textContent = `최근 기록: ${state.lastEditor} (${tStr})`;
+  } else {
+    editorBadge.textContent = '';
+  }
+}
+
+// 예선 순위 계산
+function computeStandings(divKey, groupChar) {
+  const grp = FIXED_LEAGUE_DATA[divKey].groups[groupChar];
+  const stats = grp.teams.map((t, idx) => ({
+    idx,
+    team: t,
+    played: 0,
+    wins: 0,
+    losses: 0,
+    gf: 0,
+    ga: 0,
+    diff: 0,
+    vsScores: {} // opponent idx -> "6:3"
+  }));
+
+  grp.schedule.forEach(([i, j]) => {
+    const mKey = `${divKey}_${groupChar}_${i}_${j}`;
+    const rec = state.leagueScores[mKey];
+    if (rec && rec.s1 !== '' && rec.s2 !== '') {
+      const n1 = parseInt(rec.s1, 10);
+      const n2 = parseInt(rec.s2, 10);
+      if (!isNaN(n1) && !isNaN(n2)) {
+        stats[i].played++;
+        stats[j].played++;
+        stats[i].gf += n1;
+        stats[i].ga += n2;
+        stats[j].gf += n2;
+        stats[j].ga += n1;
+        stats[i].vsScores[j] = `${n1}:${n2}`;
+        stats[j].vsScores[i] = `${n2}:${n1}`;
+        if (n1 > n2) {
+          stats[i].wins++;
+          stats[j].losses++;
+        } else if (n2 > n1) {
+          stats[j].wins++;
+          stats[i].losses++;
+        }
+      }
+    }
+  });
+
+  stats.forEach(s => { s.diff = s.gf - s.ga; });
+  const sorted = [...stats].sort((a, b) => {
+    if (b.wins !== a.wins) return b.wins - a.wins;
+    if (b.diff !== a.diff) return b.diff - a.diff;
+    if (b.gf !== a.gf) return b.gf - a.gf;
+    return a.idx - b.idx;
+  });
+
+  const rankMap = {};
+  sorted.forEach((s, rIdx) => { rankMap[s.idx] = rIdx + 1; });
+
+  return { rawStats: stats, sorted, rankMap };
+}
+
+function renderLeagueView() {
+  const divObj = FIXED_LEAGUE_DATA[currentDiv];
+  document.getElementById('leagueTitle').textContent = divObj.label;
+
+  const container = document.getElementById('leagueGroupsContainer');
+  const disAttr = isSupervisor ? '' : 'disabled';
+
+  container.innerHTML = ['A', 'B'].map(gChar => {
+    const grp = divObj.groups[gChar];
+    const { rawStats, rankMap } = computeStandings(currentDiv, gChar);
+    const n = grp.teams.length;
+
+    // Matrix Header
+    let thCols = '';
+    for (let c = 0; c < n; c++) {
+      thCols += `<th style="width:46px;">${['①','②','③','④'][c]}</th>`;
+    }
+
+    // Matrix Rows (PDF와 동일한 매트릭스 + 승/득실/순위 표)
+    const matrixRows = rawStats.map((st, rIdx) => {
+      const rank = rankMap[rIdx];
+      const rankCls = rank === 1 ? 'rank-1' : (rank === 2 ? 'rank-2' : '');
+      const diffStr = st.diff > 0 ? `+${st.diff}` : `${st.diff}`;
+      let cells = '';
+      for (let c = 0; c < n; c++) {
+        if (rIdx === c) {
+          cells += `<td class="diag"></td>`;
+        } else {
+          const sc = st.vsScores[c] || '-';
+          cells += `<td class="mono" style="font-weight:700;">${sc}</td>`;
+        }
+      }
+      return `
+        <tr>
+          <td class="left">
+            <strong style="color:var(--tennis-volt); margin-right:3px;">${['①','②','③','④'][rIdx]}</strong>
+            <strong>${st.team.name}</strong>
+            <span class="type-pill">${st.team.type}</span>
+          </td>
+          ${cells}
+          <td class="mono" style="font-weight:800;">${st.wins}승${st.losses}패</td>
+          <td class="mono">${diffStr}</td>
+          <td><span class="rank-badge ${rankCls}">${rank}</span></td>
+        </tr>
+      `;
+    }).join('');
+
+    // Ordered Match Rows (Exact PDF Sequence)
+    const matchRows = grp.schedule.map(([i, j], mIdx) => {
+      const t1 = grp.teams[i];
+      const t2 = grp.teams[j];
+      const mKey = `${currentDiv}_${gChar}_${i}_${j}`;
+      const rec = state.leagueScores[mKey] || { s1: '', s2: '' };
+      const n1 = parseInt(rec.s1, 10);
+      const n2 = parseInt(rec.s2, 10);
+      const hasScore = rec.s1 !== '' && rec.s2 !== '' && !isNaN(n1) && !isNaN(n2);
+      const w1 = hasScore && n1 > n2 ? 'winner' : '';
+      const w2 = hasScore && n2 > n1 ? 'winner' : '';
+
+      return `
+        <div class="match-row ${hasScore ? 'completed' : ''}">
+          <div class="order-num mono">${mIdx + 1}</div>
+          <div class="m-team left ${w1}">${['①','②','③','④'][i]} ${t1.name}</div>
+          <div class="score-box">
+            <input type="number" inputmode="numeric" min="0" max="99" class="score-input"
+              value="${rec.s1}" placeholder="-" ${disAttr}
+              onchange="updateLeagueScore('${mKey}', 1, this.value)" />
+            <span style="color:var(--text-muted); font-weight:800;">:</span>
+            <input type="number" inputmode="numeric" min="0" max="99" class="score-input"
+              value="${rec.s2}" placeholder="-" ${disAttr}
+              onchange="updateLeagueScore('${mKey}', 2, this.value)" />
+          </div>
+          <div class="m-team right ${w2}">${['①','②','③','④'][j]} ${t2.name}</div>
+        </div>
+      `;
+    }).join('');
+
+    return `
+      <div class="group-box">
+        <div class="group-box-header">
+          <span class="group-title">${gChar}조 풀리그 (${n}팀 · 총 ${grp.schedule.length}경기)</span>
+          <span class="badge-info">${isSupervisor ? '점수 수정 가능' : '열람 전용'}</span>
+        </div>
+
+        <div class="table-scroll">
+          <table class="matrix-table">
+            <thead>
+              <tr>
+                <th class="left">팀</th>
+                ${thCols}
+                <th>전적</th>
+                <th>득실</th>
+                <th style="width:42px;">순위</th>
+              </tr>
+            </thead>
+            <tbody>${matrixRows}</tbody>
+          </table>
+        </div>
+
+        <div class="order-title">
+          <span>📋 공식 경기 순서 (가로줄 기준 게임 스코어 입력)</span>
+        </div>
+        <div class="match-list">${matchRows}</div>
+      </div>
+    `;
+  }).join('');
+}
+
+function updateLeagueScore(mKey, side, val) {
+  if (!isSupervisor) {
+    showToast('🔒 감독관 인증 후 점수를 입력할 수 있습니다.');
+    return;
+  }
+  if (!state.leagueScores[mKey]) state.leagueScores[mKey] = { s1: '', s2: '' };
+  const clean = val === '' ? '' : String(Math.max(0, Math.min(99, parseInt(val, 10) || 0)));
+  if (side === 1) state.leagueScores[mKey].s1 = clean;
+  else state.leagueScores[mKey].s2 = clean;
+
+  state.lastEditor = supervisorName;
+  state.updatedAt = Date.now();
+  saveState();
+  updateRoleUI();
+  renderLeagueView();
+}
+
+// 예선 순위 -> 본선 대진표 자동 시드 배정
+function advanceDivisionToBracket() {
+  if (!isSupervisor) {
+    showToast('🔒 감독관 인증 후 사용할 수 있습니다.');
+    return;
+  }
+  const stA = computeStandings(currentDiv, 'A').sorted;
+  const stB = computeStandings(currentDiv, 'B').sorted;
+  const nameOf = (arr, idx, fallback) => (arr[idx] && arr[idx].played > 0) ? arr[idx].team.name : fallback;
+
+  if (currentDiv === '1') {
+    const b1 = state.brackets['1'];
+    b1.tourA.sf1.t1 = { seed: 'A조 1위', name: nameOf(stA, 0, 'A조 1위') };
+    b1.tourA.sf1.t2 = { seed: 'B조 2위', name: nameOf(stB, 1, 'B조 2위') };
+    b1.tourA.sf2.t1 = { seed: 'B조 1위', name: nameOf(stB, 0, 'B조 1위') };
+    b1.tourA.sf2.t2 = { seed: 'A조 2위', name: nameOf(stA, 1, 'A조 2위') };
+
+    b1.tourB.sf1.t1 = { seed: 'A조 3위', name: nameOf(stA, 2, 'A조 3위') };
+    b1.tourB.sf1.t2 = { seed: 'B조 4위', name: nameOf(stB, 3, 'B조 4위') };
+    b1.tourB.sf2.t1 = { seed: 'B조 3위', name: nameOf(stB, 2, 'B조 3위') };
+    b1.tourB.sf2.t2 = { seed: 'A조 4위', name: nameOf(stA, 3, 'A조 4위') };
+  } else {
+    const bx = state.brackets[currentDiv];
+    bx.seedA1 = { seed: 'A조 1위 (부전승)', name: nameOf(stA, 0, 'A조 1위') };
+    bx.seedB1 = { seed: 'B조 1위 (부전승)', name: nameOf(stB, 0, 'B조 1위') };
+    bx.qf1.t1 = { seed: 'B조 2위', name: nameOf(stB, 1, 'B조 2위') };
+    bx.qf1.t2 = { seed: 'A조 3위', name: nameOf(stA, 2, 'A조 3위') };
+    bx.qf2.t1 = { seed: 'A조 2위', name: nameOf(stA, 1, 'A조 2위') };
+    bx.qf2.t2 = { seed: 'B조 3위', name: nameOf(stB, 2, 'B조 3위') };
+  }
+
+  state.lastEditor = supervisorName;
+  state.updatedAt = Date.now();
+  saveState();
+  updateRoleUI();
+  selectStage('bracket');
+  showToast('예선 순위가 본선 토너먼트 시드에 반영되었습니다!');
+}
+
+function getWinner(t1, t2, s1, s2) {
+  const n1 = parseInt(s1, 10);
+  const n2 = parseInt(s2, 10);
+  if (s1 === '' || s2 === '' || isNaN(n1) || isNaN(n2) || n1 === n2) return null;
+  return n1 > n2 ? { idx: 1, team: t1 } : { idx: 2, team: t2 };
+}
+
+function renderSlotCard(label, t1, t2, s1, s2, winObj, pathKey, isHighlight = false) {
+  const disAttr = isSupervisor ? '' : 'disabled';
+  const w1 = winObj && winObj.idx === 1 ? 'winner' : '';
+  const w2 = winObj && winObj.idx === 2 ? 'winner' : '';
+  return `
+    <div class="b-match ${isHighlight ? 'highlight-card' : ''}">
+      <div class="b-match-label">
+        <span>${label}</span>
+        <span>${winObj ? '종료' : '대기/진행'}</span>
+      </div>
+      <div class="b-slot ${w1}">
+        <div class="b-team-info">
+          <span class="b-seed">${t1.seed}</span>
+          <span class="b-name">${t1.name}</span>
+        </div>
+        <input type="number" inputmode="numeric" min="0" max="99" class="b-score"
+          value="${s1}" placeholder="-" ${disAttr}
+          onchange="updateBracketScore('${pathKey}', 1, this.value)" />
+      </div>
+      <div class="b-slot ${w2}">
+        <div class="b-team-info">
+          <span class="b-seed">${t2.seed}</span>
+          <span class="b-name">${t2.name}</span>
+        </div>
+        <input type="number" inputmode="numeric" min="0" max="99" class="b-score"
+          value="${s2}" placeholder="-" ${disAttr}
+          onchange="updateBracketScore('${pathKey}', 2, this.value)" />
+      </div>
+    </div>
+  `;
+}
+
+// 부서별 본선 토너먼트 렌더링 (PDF 1~3페이지 구조 100% 반영)
+function renderBracketView() {
+  const container = document.getElementById('bracketContainer');
+  if (currentDiv === '1') {
+    document.getElementById('bracketTitle').textContent = '🏆 1스타 본선 (토너먼트 A · 토너먼트 B)';
+    const b1 = state.brackets['1'];
+    const wA1 = getWinner(b1.tourA.sf1.t1, b1.tourA.sf1.t2, b1.tourA.sf1.s1, b1.tourA.sf1.s2);
+    const wA2 = getWinner(b1.tourA.sf2.t1, b1.tourA.sf2.t2, b1.tourA.sf2.s1, b1.tourA.sf2.s2);
+
+    const wB1 = getWinner(b1.tourB.sf1.t1, b1.tourB.sf1.t2, b1.tourB.sf1.s1, b1.tourB.sf1.s2);
+    const wB2 = getWinner(b1.tourB.sf2.t1, b1.tourB.sf2.t2, b1.tourB.sf2.s1, b1.tourB.sf2.s2);
+    const bFinalT1 = wB1 ? wB1.team : { seed: '4강 1경기 승자', name: '대기 중' };
+    const bFinalT2 = wB2 ? wB2.team : { seed: '4강 2경기 승자', name: '대기 중' };
+    const wBFinal = getWinner(bFinalT1, bFinalT2, b1.tourB.final.s1, b1.tourB.final.s2);
+
+    container.innerHTML = `
+      <div class="bracket-section-box">
+        <div class="b-sec-head">
+          <span class="b-sec-title">토너먼트 A (각 조 1·2위 → 4강 승자 2팀 통합 최종전 진출)</span>
+          <span class="badge-info">조 1위 vs 다른 조 2위</span>
+        </div>
+        <div class="bracket-scroll">
+          <div class="bracket-grid">
+            <div class="round-col">
+              <div class="round-header">4강전 (Semi-Finals)</div>
+              ${renderSlotCard('4강 1경기', b1.tourA.sf1.t1, b1.tourA.sf1.t2, b1.tourA.sf1.s1, b1.tourA.sf1.s2, wA1, '1.tourA.sf1')}
+              ${renderSlotCard('4강 2경기', b1.tourA.sf2.t1, b1.tourA.sf2.t2, b1.tourA.sf2.s1, b1.tourA.sf2.s2, wA2, '1.tourA.sf2')}
+            </div>
+            <div class="round-col">
+              <div class="round-header">통합 최종전 진출 확정</div>
+              <div class="advancer-box">
+                <div class="label">👑 최종전 진출 ① (C 시드)</div>
+                <div class="val">${wA1 ? wA1.team.name : '4강 1경기 승자 대기'}</div>
+              </div>
+              <div class="advancer-box">
+                <div class="label">👑 최종전 진출 ② (c 시드)</div>
+                <div class="val">${wA2 ? wA2.team.name : '4강 2경기 승자 대기'}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bracket-section-box">
+        <div class="b-sec-head">
+          <span class="b-sec-title">토너먼트 B (각 조 3·4위 → 4강 → 결승 우승까지 진행)</span>
+          <span class="badge-info">조 3위 vs 다른 조 4위</span>
+        </div>
+        <div class="bracket-scroll">
+          <div class="bracket-grid">
+            <div class="round-col">
+              <div class="round-header">4강전</div>
+              ${renderSlotCard('4강 1경기', b1.tourB.sf1.t1, b1.tourB.sf1.t2, b1.tourB.sf1.s1, b1.tourB.sf1.s2, wB1, '1.tourB.sf1')}
+              ${renderSlotCard('4강 2경기', b1.tourB.sf2.t1, b1.tourB.sf2.t2, b1.tourB.sf2.s1, b1.tourB.sf2.s2, wB2, '1.tourB.sf2')}
+            </div>
+            <div class="round-col">
+              <div class="round-header">결승전</div>
+              ${renderSlotCard('토너먼트 B 결승', bFinalT1, bFinalT2, b1.tourB.final.s1, b1.tourB.final.s2, wBFinal, '1.tourB.final', true)}
+            </div>
+            <div class="round-col">
+              <div class="round-header">토너먼트 B 우승</div>
+              <div class="advancer-box">
+                <div class="label">🏆 토너먼트 B CHAMPION</div>
+                <div class="val">${wBFinal ? wBFinal.team.name : '결승 결과 대기'}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  } else {
+    // 2스타 및 3·4스타 본선 (PDF 2~3페이지: 8강 -> 4강 -> 최종전 진출 ①, ②)
+    const divLabel = currentDiv === '2' ? '2스타' : '3·4스타';
+    document.getElementById('bracketTitle').textContent = `🏆 ${divLabel} 본선 (8강 → 4강 → 최종전 진출)`;
+    const bx = state.brackets[currentDiv];
+
+    const wQF1 = getWinner(bx.qf1.t1, bx.qf1.t2, bx.qf1.s1, bx.qf1.s2);
+    const wQF2 = getWinner(bx.qf2.t1, bx.qf2.t2, bx.qf2.s1, bx.qf2.s2);
+
+    const sf1T1 = bx.seedA1;
+    const sf1T2 = wQF1 ? wQF1.team : { seed: '8강 1경기 승자', name: '대기 중' };
+    const sf2T1 = bx.seedB1;
+    const sf2T2 = wQF2 ? wQF2.team : { seed: '8강 2경기 승자', name: '대기 중' };
+
+    const wSF1 = getWinner(sf1T1, sf1T2, bx.sf1.s1, bx.sf1.s2);
+    const wSF2 = getWinner(sf2T1, sf2T2, bx.sf2.s1, bx.sf2.s2);
+
+    container.innerHTML = `
+      <div class="bracket-section-box">
+        <div class="b-sec-head">
+          <span class="b-sec-title">각 조 1위 부전승(4강 직행) · 2·3위 교차 8강 → 4강 승자 2팀 최종전 진출</span>
+        </div>
+        <div class="bracket-scroll">
+          <div class="bracket-grid">
+            <div class="round-col">
+              <div class="round-header">8강 (교차 플레이오프)</div>
+              <div class="b-match" style="opacity:0.8;">
+                <div class="b-match-label"><span>부전승 → 4강 직행</span></div>
+                <div class="b-slot"><div class="b-team-info"><span class="b-seed">${bx.seedA1.seed}</span><span class="b-name">${bx.seedA1.name}</span></div></div>
+              </div>
+              ${renderSlotCard('8강 1경기', bx.qf1.t1, bx.qf1.t2, bx.qf1.s1, bx.qf1.s2, wQF1, `${currentDiv}.qf1`)}
+              <div class="b-match" style="opacity:0.8;">
+                <div class="b-match-label"><span>부전승 → 4강 직행</span></div>
+                <div class="b-slot"><div class="b-team-info"><span class="b-seed">${bx.seedB1.seed}</span><span class="b-name">${bx.seedB1.name}</span></div></div>
+              </div>
+              ${renderSlotCard('8강 2경기', bx.qf2.t1, bx.qf2.t2, bx.qf2.s1, bx.qf2.s2, wQF2, `${currentDiv}.qf2`)}
+            </div>
+
+            <div class="round-col">
+              <div class="round-header">4강전 (Semi-Finals)</div>
+              ${renderSlotCard('4강 1경기', sf1T1, sf1T2, bx.sf1.s1, bx.sf1.s2, wSF1, `${currentDiv}.sf1`)}
+              ${renderSlotCard('4강 2경기', sf2T1, sf2T2, bx.sf2.s1, bx.sf2.s2, wSF2, `${currentDiv}.sf2`)}
+            </div>
+
+            <div class="round-col">
+              <div class="round-header">통합 최종전 진출 확정</div>
+              <div class="advancer-box">
+                <div class="label">👑 최종전 진출 ①</div>
+                <div class="val">${wSF1 ? wSF1.team.name : '4강 1경기 승자 대기'}</div>
+              </div>
+              <div class="advancer-box">
+                <div class="label">👑 최종전 진출 ②</div>
+                <div class="val">${wSF2 ? wSF2.team.name : '4강 2경기 승자 대기'}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+}
+
+function updateGrandTeamName(slotKey, val) {
+  if (!isSupervisor) {
+    showToast('🔒 감독관 인증 후 팀 이름을 입력할 수 있습니다.');
+    return;
+  }
+  state.brackets.grand[slotKey].name = val.trim();
+  state.lastEditor = supervisorName;
+  state.updatedAt = Date.now();
+  saveState();
+  updateRoleUI();
+  renderGrandView();
+}
+
+function clearGrandBracket() {
+  if (!isSupervisor) return;
+  state.brackets.grand = createInitialBrackets().grand;
+  state.lastEditor = supervisorName;
+  state.updatedAt = Date.now();
+  saveState();
+  updateRoleUI();
+  renderGrandView();
+  showToast('통합 최종전 대진표가 초기화되었습니다.');
+}
+
+function renderEditableGrandCard(label, slotKey1, slotKey2, s1, s2, winObj, pathKey) {
+  const g = state.brackets.grand;
+  const t1 = g[slotKey1];
+  const t2 = g[slotKey2];
+  const disAttr = isSupervisor ? '' : 'disabled';
+  const ph1 = isSupervisor ? '팀명 입력' : '미정';
+  const ph2 = isSupervisor ? '팀명 입력' : '미정';
+  const w1 = winObj && winObj.idx === 1 ? 'winner' : '';
+  const w2 = winObj && winObj.idx === 2 ? 'winner' : '';
+
+  return `
+    <div class="b-match">
+      <div class="b-match-label">
+        <span>${label}</span>
+        <span>${winObj ? '종료' : '대기/진행'}</span>
+      </div>
+      <div class="b-slot ${w1}">
+        <div class="b-team-info">
+          <span class="b-seed">${t1.seed}</span>
+          <input type="text" class="b-name-input" value="${t1.name || ''}" placeholder="${ph1}" ${disAttr}
+            onchange="updateGrandTeamName('${slotKey1}', this.value)" />
+        </div>
+        <input type="number" inputmode="numeric" min="0" max="99" class="b-score"
+          value="${s1}" placeholder="-" ${disAttr}
+          onchange="updateBracketScore('${pathKey}', 1, this.value)" />
+      </div>
+      <div class="b-slot ${w2}">
+        <div class="b-team-info">
+          <span class="b-seed">${t2.seed}</span>
+          <input type="text" class="b-name-input" value="${t2.name || ''}" placeholder="${ph2}" ${disAttr}
+            onchange="updateGrandTeamName('${slotKey2}', this.value)" />
+        </div>
+        <input type="number" inputmode="numeric" min="0" max="99" class="b-score"
+          value="${s2}" placeholder="-" ${disAttr}
+          onchange="updateBracketScore('${pathKey}', 2, this.value)" />
+      </div>
+    </div>
+  `;
+}
+
+function renderGrandView() {
+  const g = state.brackets.grand;
+  const disAttr = isSupervisor ? '' : 'disabled';
+  const phBye = isSupervisor ? '부전승 팀명 입력' : '미정';
+
+  const dispName = (slotObj, fallback) => (slotObj && slotObj.name && slotObj.name.trim()) ? slotObj.name.trim() : fallback;
+
+  const t_b = { seed: g.slotb.seed, name: dispName(g.slotb, 'b 시드 대기') };
+  const t_C = { seed: g.slotC.seed, name: dispName(g.slotC, 'C 시드 대기') };
+  const t_B = { seed: g.slotB.seed, name: dispName(g.slotB, 'B 시드 대기') };
+  const t_c = { seed: g.slotc.seed, name: dispName(g.slotc, 'c 시드 대기') };
+
+  const wQF1 = getWinner(t_b, t_C, g.qf1.s1, g.qf1.s2); // b vs C
+  const wQF2 = getWinner(t_B, t_c, g.qf2.s1, g.qf2.s2); // B vs c
+
+  const sf1T1 = { seed: g.slotA.seed, name: dispName(g.slotA, 'A 시드 대기') };
+  const sf1T2 = wQF1 ? wQF1.team : { seed: '8강 1경기 승자', name: '대기 중' };
+  const sf2T1 = { seed: g.slota.seed, name: dispName(g.slota, 'a 시드 대기') };
+  const sf2T2 = wQF2 ? wQF2.team : { seed: '8강 2경기 승자', name: '대기 중' };
+
+  const wSF1 = getWinner(sf1T1, sf1T2, g.sf1.s1, g.sf1.s2);
+  const wSF2 = getWinner(sf2T1, sf2T2, g.sf2.s1, g.sf2.s2);
+
+  const fT1 = wSF1 ? wSF1.team : { seed: '4강 1경기 승자', name: '대기 중' };
+  const fT2 = wSF2 ? wSF2.team : { seed: '4강 2경기 승자', name: '대기 중' };
+  const wFinal = getWinner(fT1, fT2, g.final.s1, g.final.s2);
+
+  document.getElementById('grandContainer').innerHTML = `
+    <div class="bracket-section-box">
+      <div class="b-sec-head">
+        <span class="b-sec-title">A, a 부전승(4강 직행) · b vs C, B vs c 8강 → 4강 → 결승</span>
+      </div>
+      <div class="bracket-scroll">
+        <div class="bracket-grid" style="min-width:880px;">
+          <div class="round-col">
+            <div class="round-header">8강전 (팀명 자유 입력)</div>
+            <div class="b-match">
+              <div class="b-match-label"><span>부전승 → 4강 직행</span></div>
+              <div class="b-slot">
+                <div class="b-team-info">
+                  <span class="b-seed">${g.slotA.seed}</span>
+                  <input type="text" class="b-name-input" value="${g.slotA.name || ''}" placeholder="${phBye}" ${disAttr}
+                    onchange="updateGrandTeamName('slotA', this.value)" />
+                </div>
+              </div>
+            </div>
+            ${renderEditableGrandCard('8강 1경기 (b vs C)', 'slotb', 'slotC', g.qf1.s1, g.qf1.s2, wQF1, 'grand.qf1')}
+            <div class="b-match">
+              <div class="b-match-label"><span>부전승 → 4강 직행</span></div>
+              <div class="b-slot">
+                <div class="b-team-info">
+                  <span class="b-seed">${g.slota.seed}</span>
+                  <input type="text" class="b-name-input" value="${g.slota.name || ''}" placeholder="${phBye}" ${disAttr}
+                    onchange="updateGrandTeamName('slota', this.value)" />
+                </div>
+              </div>
+            </div>
+            ${renderEditableGrandCard('8강 2경기 (B vs c)', 'slotB', 'slotc', g.qf2.s1, g.qf2.s2, wQF2, 'grand.qf2')}
+          </div>
+
+          <div class="round-col">
+            <div class="round-header">4강전</div>
+            ${renderSlotCard('4강 1경기', sf1T1, sf1T2, g.sf1.s1, g.sf1.s2, wSF1, 'grand.sf1')}
+            ${renderSlotCard('4강 2경기', sf2T1, sf2T2, g.sf2.s1, g.sf2.s2, wSF2, 'grand.sf2')}
+          </div>
+
+          <div class="round-col">
+            <div class="round-header">결승전</div>
+            ${renderSlotCard('통합 최종 결승전', fT1, fT2, g.final.s1, g.final.s2, wFinal, 'grand.final', true)}
+          </div>
+
+          <div class="round-col">
+            <div class="round-header">최종 우승</div>
+            <div class="advancer-box" style="padding:18px 12px;">
+              <div class="label">👑 GRAND CHAMPION</div>
+              <div class="val" style="font-size:1.15rem; margin-top:6px;">${wFinal ? wFinal.team.name : '최종 결승 결과 대기'}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function updateBracketScore(pathKey, side, val) {
+  if (!isSupervisor) {
+    showToast('🔒 감독관 인증 후 점수를 수정할 수 있습니다.');
+    return;
+  }
+  const clean = val === '' ? '' : String(Math.max(0, Math.min(99, parseInt(val, 10) || 0)));
+  const parts = pathKey.split('.');
+  let target = state.brackets;
+  for (let i = 0; i < parts.length; i++) {
+    target = target[parts[i]];
+  }
+  if (side === 1) target.s1 = clean;
+  else target.s2 = clean;
+
+  state.lastEditor = supervisorName;
+  state.updatedAt = Date.now();
+  saveState();
+  updateRoleUI();
+  renderAll();
+}
+
+// Navigation
+function selectDivision(divKey) {
+  currentDiv = divKey;
+  document.querySelectorAll('.div-btn').forEach(b => b.classList.toggle('active', b.dataset.div === divKey));
+
+  const stageGroup = document.getElementById('stageTabGroup');
+  if (divKey === 'grand') {
+    stageGroup.style.display = 'none';
+    document.getElementById('viewLeague').style.display = 'none';
+    document.getElementById('viewBracket').style.display = 'none';
+    document.getElementById('viewGrand').style.display = 'block';
+    renderGrandView();
+  } else {
+    stageGroup.style.display = 'grid';
+    document.getElementById('viewGrand').style.display = 'none';
+    selectStage(currentStage);
+  }
+}
+
+function selectStage(stageKey) {
+  currentStage = stageKey;
+  document.querySelectorAll('.stage-btn').forEach(b => b.classList.toggle('active', b.dataset.stage === stageKey));
+  if (currentDiv === 'grand') return;
+
+  document.getElementById('viewLeague').style.display = stageKey === 'league' ? 'block' : 'none';
+  document.getElementById('viewBracket').style.display = stageKey === 'bracket' ? 'block' : 'none';
+  renderAll();
+}
+
+function renderAll() {
+  if (currentDiv === 'grand') {
+    renderGrandView();
+  } else if (currentStage === 'league') {
+    renderLeagueView();
+  } else {
+    renderBracketView();
+  }
+}
+
+// Storage & Google Apps Script Sync (영구 저장 & 껐다 켜도 즉시 복원)
+let isSavingNow = false;
+
+function setSyncPillState(mode, text) {
+  const pill = document.getElementById('syncStatusPill');
+  if (!pill) return;
+  pill.textContent = text;
+  if (mode === 'ok') {
+    pill.classList.add('connected');
+    pill.style.borderColor = '';
+    pill.style.color = '';
+  } else if (mode === 'saving') {
+    pill.classList.add('connected');
+    pill.style.borderColor = 'var(--tennis-volt)';
+    pill.style.color = 'var(--tennis-volt)';
+  } else {
+    pill.classList.remove('connected');
+    pill.style.borderColor = '';
+    pill.style.color = '';
+  }
+}
+
+function saveState() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  } catch (e) {}
+
+  const gasUrl = getActiveGasUrl();
+  if (gasUrl) {
+    isSavingNow = true;
+    setSyncPillState('saving', '⏳ 구글시트 저장중...');
+
+    const payloadStr = JSON.stringify(state);
+    const sep = gasUrl.includes('?') ? '&' : '?';
+    const getSaveUrl = `${gasUrl}${sep}action=save&data=${encodeURIComponent(payloadStr)}&t=${Date.now()}`;
+
+    // Google Sites 샌드박스 iframe에서도 리다이렉트 유실 없이 100% 도달하도록 GET 파라미터 전송 사용
+    fetch(getSaveUrl, {
+      method: 'GET',
+      mode: 'no-cors'
+    }).then(() => {
+      const t = new Date().toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      setSyncPillState('ok', `☁️ 저장됨 (${t})`);
+      setTimeout(() => { isSavingNow = false; }, 1200);
+    }).catch(() => {
+      // fetch 실패 시 Image 비콘으로 이중 백업 전송
+      try {
+        const img = new Image();
+        img.src = getSaveUrl;
+      } catch (err) {}
+      isSavingNow = false;
+      setSyncPillState('local', '⚠️ 전송 지연 (재시도)');
+    });
+  }
+}
+
+function loadLocalState() {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      if (parsed && parsed.brackets) {
+        state = Object.assign(state, parsed);
+      }
+    }
+  } catch (e) {}
+}
+
+async function manualPullFromGas(silent = false, forceInitial = false) {
+  const gasUrl = getActiveGasUrl();
+  if (!gasUrl) return;
+  if (isSavingNow && !forceInitial) return;
+
+  try {
+    if (forceInitial) setSyncPillState('saving', '⏳ 데이터 불러오는중...');
+    const res = await fetch(gasUrl + (gasUrl.includes('?') ? '&' : '?') + 't=' + Date.now());
+    const data = await res.json();
+    if (data && data.brackets) {
+      if (forceInitial || (data.updatedAt && data.updatedAt > (state.updatedAt || 0))) {
+        state = Object.assign(state, data);
+        if (state.brackets && state.brackets.grand) {
+          ['slotA','slota','slotb','slotC','slotB','slotc'].forEach(k => {
+            if (state.brackets.grand[k] && /최종진출/.test(state.brackets.grand[k].name)) {
+              state.brackets.grand[k].name = '';
+            }
+          });
+        }
+        try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (e) {}
+        updateRoleUI();
+        renderAll();
+        const t = new Date().toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' });
+        setSyncPillState('ok', `☁️ 동기화됨 (${t})`);
+        if (!silent) showToast('☁️ 구글 시트에서 최신 점수를 불러왔습니다!');
+      } else {
+        setSyncPillState('ok', '☁️ 실시간 동기화중');
+        if (!silent) showToast('현재 최신 상태입니다.');
+      }
+    } else {
+      setSyncPillState('ok', '☁️ 구글시트 연결됨');
+    }
+  } catch (e) {
+    if (!silent) showToast('구글 시트 데이터를 불러오지 못했습니다. 배포 권한(모든 사용자)을 확인해 주세요.');
+  }
+}
+
+function saveGasUrl() {
+  const url = document.getElementById('gasUrlInput').value.trim();
+  if (url) {
+    try { localStorage.setItem(GAS_URL_KEY, url); } catch (e) {}
+    updateSyncBadge();
+    startPolling();
+    manualPullFromGas(false, true);
+    showToast('☁️ 구글 시트 영구 저장 연동 완료!');
+  } else {
+    try { localStorage.removeItem(GAS_URL_KEY); } catch (e) {}
+    updateSyncBadge();
+    stopPolling();
+    showToast('💾 로컬 임시 모드로 전환되었습니다.');
+  }
+  closeModal('syncModal');
+}
+
+function updateSyncBadge() {
+  const gasUrl = getActiveGasUrl();
+  if (gasUrl) {
+    setSyncPillState('ok', '☁️ 구글시트 연결됨');
+  } else {
+    setSyncPillState('local', '⚠️ 미연동 (새로고침시 초기화)');
+  }
+}
+
+function startPolling() {
+  stopPolling();
+  if (getActiveGasUrl()) {
+    pollTimer = setInterval(() => manualPullFromGas(true, false), 4000);
+  }
+}
+function stopPolling() {
+  if (pollTimer) { clearInterval(pollTimer); pollTimer = null; }
+}
+
+function resetAllScores() {
+  if (!isSupervisor) {
+    showToast('🔒 감독관 인증 후 초기화할 수 있습니다.');
+    return;
+  }
+  state.leagueScores = {};
+  state.brackets = createInitialBrackets();
+  state.lastEditor = `${supervisorName} (전체초기화)`;
+  state.updatedAt = Date.now();
+  saveState();
+  closeModal('syncModal');
+  updateRoleUI();
+  renderAll();
+  showToast('모든 예선·본선·최종전 점수가 초기화되었습니다.');
+}
+
+// URL 미연동 상태에서 점수 입력 후 실수로 창 닫을 때 브라우저 경고창 표시
+window.addEventListener('beforeunload', function (e) {
+  if (!getActiveGasUrl() && Object.keys(state.leagueScores || {}).length > 0) {
+    e.preventDefault();
+    e.returnValue = '';
+  }
+});
+
+function copyGasCode() {
+  const ta = document.getElementById('gasCodeBox');
+  ta.select();
+  navigator.clipboard.writeText(ta.value).then(() => showToast('Apps Script 코드가 복사되었습니다!'));
+}
+
+function copyFullSummary() {
+  const divKeys = ['1', '2', '34'];
+  const divNames = { '1': '1스타', '2': '2스타', '34': '3·4스타 통합' };
+  let lines = ['🎾 [테니스플러스 내전 실시간 순위 현황]\n'];
+
+  divKeys.forEach(dk => {
+    lines.push(`■ ${divNames[dk]}`);
+    ['A', 'B'].forEach(gc => {
+      const { sorted } = computeStandings(dk, gc);
+      const rStr = sorted.map((s, idx) =>
+        `${idx+1}위 ${s.team.name} (${s.wins}승${s.losses}패, 득실 ${s.diff >= 0 ? '+'+s.diff : s.diff})`
+      ).join(' / ');
+      lines.push(`• ${gc}조: ${rStr}`);
+    });
+    lines.push('');
+  });
+
+  navigator.clipboard.writeText(lines.join('\n')).then(() => showToast('전체 부서 예선 순위 현황이 복사되었습니다!'));
+}
+
+function openModal(id) {
+  if (id === 'syncModal') {
+    document.getElementById('gasUrlInput').value = getActiveGasUrl();
+  }
+  document.getElementById(id).classList.add('open');
+}
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+}
+
+// Init: 열리자마자 로컬 및 구글 시트에서 최신 데이터 즉시 복원
+loadLocalState();
+loadAdminSession();
+updateSyncBadge();
+renderAll();
+if (getActiveGasUrl()) {
+  manualPullFromGas(true, true);
+}
+startPolling();
+</script>
+</body>
+</html>
